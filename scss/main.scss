@@ -1,0 +1,91 @@
+//import pulls in the 'partial' scss files, that the compiler knows are partials because the filename starts with an "_"
+@import "./resets";
+@import "./variables";
+
+//these are variables... can use them just like other prog languages.
+$text-color: #fff;
+
+//mixin's
+//args are optional
+@mixin flexCenter($direction){
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: $direction;
+}
+
+@mixin theme($light-theme: true){
+    @if $light-theme{
+        background: lighten($primary-color, 100%);
+        color: darken($text-color, 100%);
+    }
+}
+
+@mixin mobile{
+    @media ( max-width: $mobile){
+        //content gets passed in when the mixin is called
+        @content;
+    }
+}
+
+
+//functions
+@function weight($weight-name){
+    @return map-get($font-weights, $weight-name );
+}
+
+//maps are just like arrays... they're sets of KVP's
+$font-weights: (
+    "regular": 400,
+    "medium:": 500,
+    "bold": 800
+);
+
+body {
+    background: teal;
+    border-color: $accent-color;
+    color: $text-color;
+    //getting the value from a map variable
+    //font-weight: map-get($font-weights, bold );
+    //getting the value from a function
+    font-weight: weight(bold);
+}
+
+//this is nesting.. so instead of having to right out ".main p" to access the p element inside of the .main
+.main {
+    //can do inline calculations, just cant mix types.. ie. all types have to be %'s, can't do px's and em's or em's and %'s.
+    width: 80%;
+    height: 60% - 20%;
+    margin: 0 auto;
+
+    //getting our flex stuff from the mixin
+    @include flexCenter(column);
+
+    // p{
+    //     font-weight: map-get($font-weights, regular);
+    // }
+    // & == the parent of the nested element
+    //the #{} is basically adding string interpolation
+    #{&}__paragraph1{
+             //font-weight: map-get($font-weights, bold);
+             font-weight: weight( bold);
+             &:hover{
+                 color:orange;
+             }
+    }
+
+    #{&}__paragraph2{
+        @extend .main__paragraph1;
+        &:hover{
+            color: $accent-color;
+        }
+    }
+
+    @include mobile(){
+        flex-direction: column;
+    }
+}
+
+.light{
+    @include theme($light-theme: true);
+}
